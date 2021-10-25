@@ -49,7 +49,7 @@ kind: Gateway
 apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
 metadata:
-  name: contour-external
+  name: knative-gateway
   namespace: contour-external
 spec:
   gatewayClassName: contour-external-gatewayclass
