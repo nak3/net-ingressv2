@@ -51,7 +51,6 @@ import (
 	"knative.dev/networking/pkg/apis/networking"
 	"knative.dev/networking/test/types"
 	"knative.dev/pkg/network"
-	"knative.dev/pkg/ptr"
 	"knative.dev/pkg/reconciler"
 	pkgTest "knative.dev/pkg/test"
 	"knative.dev/pkg/test/logging"
@@ -90,14 +89,12 @@ var testGateway = gatewayv1alpha2.ParentRef{
 	Name: "test-gateway",
 	// TODO: istio-system namespace should be configurable.
 	Namespace: namespacePtr("istio-system"),
-	Scope:     ptr.String("Namespace"),
 }
 
 var testLocalGateway = gatewayv1alpha2.ParentRef{
 	Name: "test-local-gateway",
 	// TODO: istio-system namespace should be configurable.
 	Namespace: namespacePtr("istio-system"),
-	Scope:     ptr.String("Namespace"),
 }
 
 // gatewayLabel is added to HTTPRoute. The external gateway selects the generated HTTPRoute by this label.
@@ -123,7 +120,7 @@ func (ua *uaRoundTripper) RoundTrip(rq *http.Request) (*http.Response, error) {
 // specified with the given portName.  It returns the service name, the port on
 // which the service is listening, and a "cancel" function to clean up the
 // created resources.
-func CreateRuntimeService(ctx context.Context, t *testing.T, clients *test.Clients, portName string) (string, int, context.CancelFunc) {
+func CreateRuntimeService(ctx context.Context, t *testing.T, clients *test.Clients, portName string) (gatewayv1alpha2.ObjectName, int, context.CancelFunc) {
 	t.Helper()
 	name := test.ObjectNameForTest(t)
 
@@ -190,7 +187,7 @@ func CreateRuntimeService(ctx context.Context, t *testing.T, clients *test.Clien
 		},
 	}
 
-	return name, port, createPodAndService(ctx, t, clients, pod, svc)
+	return gatewayv1alpha2.ObjectName(name), port, createPodAndService(ctx, t, clients, pod, svc)
 }
 
 // CreateProxyService creates a Kubernetes service that will forward requests to
