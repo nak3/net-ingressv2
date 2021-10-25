@@ -56,7 +56,7 @@ func TestGRPC(t *testing.T) {
 				BackendRef: gatewayv1alpha2.BackendRef{
 					BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 						Port: portNumPtr(port),
-						Name: name,
+						Name: gatewayv1alpha2.ObjectName(name),
 					}}},
 			},
 		}},
@@ -121,7 +121,7 @@ func TestGRPCSplit(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(bluePort),
-							Name: blueName,
+							Name: gatewayv1alpha2.ObjectName(blueName),
 						},
 						Weight: pointer.Int32Ptr(1),
 					},
@@ -130,7 +130,7 @@ func TestGRPCSplit(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(greenPort),
-							Name: greenName,
+							Name: gatewayv1alpha2.ObjectName(greenName),
 						},
 						Weight: pointer.Int32Ptr(1),
 					},

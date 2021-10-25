@@ -120,7 +120,7 @@ func (ua *uaRoundTripper) RoundTrip(rq *http.Request) (*http.Response, error) {
 // specified with the given portName.  It returns the service name, the port on
 // which the service is listening, and a "cancel" function to clean up the
 // created resources.
-func CreateRuntimeService(ctx context.Context, t *testing.T, clients *test.Clients, portName string) (gatewayv1alpha2.ObjectName, int, context.CancelFunc) {
+func CreateRuntimeService(ctx context.Context, t *testing.T, clients *test.Clients, portName string) (string, int, context.CancelFunc) {
 	t.Helper()
 	name := test.ObjectNameForTest(t)
 
@@ -187,7 +187,7 @@ func CreateRuntimeService(ctx context.Context, t *testing.T, clients *test.Clien
 		},
 	}
 
-	return gatewayv1alpha2.ObjectName(name), port, createPodAndService(ctx, t, clients, pod, svc)
+	return name, port, createPodAndService(ctx, t, clients, pod, svc)
 }
 
 // CreateProxyService creates a Kubernetes service that will forward requests to
@@ -1120,7 +1120,7 @@ func IsHTTPRouteReady(r *gatewayv1alpha2.HTTPRoute) (bool, error) {
 
 func isGatewayAdmitted(gw gatewayv1alpha2.RouteParentStatus) bool {
 	for _, condition := range gw.Conditions {
-		if condition.Type == string(gatewayv1alpha2.ConditionRouteAdmitted) {
+		if condition.Type == string(gatewayv1alpha2.ConditionRouteAccepted) {
 			return condition.Status == metav1.ConditionTrue
 		}
 	}

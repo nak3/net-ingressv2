@@ -60,7 +60,7 @@ func TestPath(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(fooPort),
-							Name: fooName,
+							Name: gatewayv1alpha2.ObjectName(fooName),
 						}},
 					// Append different headers to each split, which lets us identify
 					// which backend we hit.
@@ -76,7 +76,7 @@ func TestPath(t *testing.T) {
 				}},
 				Matches: []gatewayv1alpha2.HTTPRouteMatch{{
 					Path: &gatewayv1alpha2.HTTPPathMatch{
-						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPrefix),
+						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPathPrefix),
 						Value: pointer.StringPtr("/foo"),
 					},
 				}},
@@ -86,7 +86,7 @@ func TestPath(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(barPort),
-							Name: barName,
+							Name: gatewayv1alpha2.ObjectName(barName),
 						}},
 					// Append different headers to each split, which lets us identify
 					// which backend we hit.
@@ -102,7 +102,7 @@ func TestPath(t *testing.T) {
 				}},
 				Matches: []gatewayv1alpha2.HTTPRouteMatch{{
 					Path: &gatewayv1alpha2.HTTPPathMatch{
-						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPrefix),
+						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPathPrefix),
 						Value: pointer.StringPtr("/bar"),
 					},
 				}},
@@ -112,7 +112,7 @@ func TestPath(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(bazPort),
-							Name: bazName,
+							Name: gatewayv1alpha2.ObjectName(bazName),
 						}},
 					// Append different headers to each split, which lets us identify
 					// which backend we hit.
@@ -128,7 +128,7 @@ func TestPath(t *testing.T) {
 				}},
 				Matches: []gatewayv1alpha2.HTTPRouteMatch{{
 					Path: &gatewayv1alpha2.HTTPPathMatch{
-						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPrefix),
+						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPathPrefix),
 						Value: pointer.StringPtr("/baz"),
 					},
 				}},
@@ -138,7 +138,7 @@ func TestPath(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(port),
-							Name: name,
+							Name: gatewayv1alpha2.ObjectName(name),
 						}},
 					// Append different headers to each split, which lets us identify
 					// which backend we hit.
@@ -207,7 +207,7 @@ func TestPathAndPercentageSplit(t *testing.T) {
 						BackendRef: gatewayv1alpha2.BackendRef{
 							BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 								Port: portNumPtr(fooPort),
-								Name: fooName,
+								Name: gatewayv1alpha2.ObjectName(fooName),
 							},
 							Weight: pointer.Int32Ptr(1),
 						},
@@ -225,7 +225,7 @@ func TestPathAndPercentageSplit(t *testing.T) {
 						BackendRef: gatewayv1alpha2.BackendRef{
 							BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 								Port: portNumPtr(barPort),
-								Name: barName,
+								Name: gatewayv1alpha2.ObjectName(barName),
 							},
 							Weight: pointer.Int32Ptr(1),
 						},
@@ -242,7 +242,7 @@ func TestPathAndPercentageSplit(t *testing.T) {
 				},
 				Matches: []gatewayv1alpha2.HTTPRouteMatch{{
 					Path: &gatewayv1alpha2.HTTPPathMatch{
-						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPrefix),
+						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPathPrefix),
 						Value: pointer.StringPtr("/foo"),
 					},
 				}},
@@ -252,7 +252,7 @@ func TestPathAndPercentageSplit(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(port),
-							Name: name,
+							Name: gatewayv1alpha2.ObjectName(name),
 						}},
 					// Append different headers to each split, which lets us identify
 					// which backend we hit.

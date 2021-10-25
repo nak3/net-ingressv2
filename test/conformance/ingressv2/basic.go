@@ -42,7 +42,7 @@ func TestBasics(t *testing.T) {
 				BackendRef: gatewayv1alpha2.BackendRef{
 					BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 						Port: portNumPtr(port),
-						Name: name,
+						Name: gatewayv1alpha2.ObjectName(name),
 					}}},
 			},
 		}},
@@ -69,7 +69,7 @@ func TestBasicsHTTP2(t *testing.T) {
 				BackendRef: gatewayv1alpha2.BackendRef{
 					BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 						Port: portNumPtr(port),
-						Name: name,
+						Name: gatewayv1alpha2.ObjectName(name),
 					}}},
 			},
 		}},

@@ -46,7 +46,7 @@ func TestRewriteHost(t *testing.T) {
 				BackendRef: gatewayv1alpha2.BackendRef{
 					BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 						Port: portNumPtr(port),
-						Name: name,
+						Name: gatewayv1alpha2.ObjectName(name),
 					}}},
 			},
 		}},
@@ -75,7 +75,7 @@ func TestRewriteHost(t *testing.T) {
 				BackendRef: gatewayv1alpha2.BackendRef{
 					BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 						Port: portNumPtr(80),
-						Name: privateServiceName,
+						Name: gatewayv1alpha2.ObjectName(privateServiceName),
 					}}},
 			},
 			Filters: []gatewayv1alpha2.HTTPRouteFilter{{
