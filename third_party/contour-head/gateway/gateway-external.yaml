@@ -34,7 +34,7 @@ spec:
       type: LoadBalancerService
 ---
 kind: GatewayClass
-apiVersion: networking.x-k8s.io/v1alpha1
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: contour-external-gatewayclass
 spec:
@@ -47,32 +47,17 @@ spec:
     namespace: contour-external
 ---
 kind: Gateway
-apiVersion: networking.x-k8s.io/v1alpha1
+apiVersion: gateway.networking.k8s.io/v1alpha2
+metadata:
 metadata:
   name: contour-external
   namespace: contour-external
 spec:
   gatewayClassName: contour-external-gatewayclass
   listeners:
-  - protocol: HTTP
+  - name: default
     port: 80
-    routes:
-      kind: HTTPRoute
-      selector:
-        matchLabels:
-          knative-e2e-test: "net-ingressv2"
+    protocol: HTTP
+    allowedRoutes:
       namespaces:
-        from: "All"
-  - protocol: HTTPS
-    port: 443
-    tls:
-      mode: Terminate
-      routeOverride:
-        certificate: Allow
-    routes:
-      kind: HTTPRoute
-      selector:
-        matchLabels:
-          knative-e2e-test: "net-ingressv2"
-      namespaces:
-        from: "All"
+        from: All
