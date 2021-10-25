@@ -39,6 +39,8 @@ var istioStableTests = map[string]func(t *testing.T){
 	"grpc":                         TestGRPC,
 	"grpc/split":                   TestGRPCSplit,
 	"visibility":                   TestVisibility,
+	//	"visibility/split":             TestVisibilitySplit,
+	//	"visibility/path":              TestVisibilityPath,
 }
 
 var contourStableTests = map[string]func(t *testing.T){
@@ -52,6 +54,8 @@ var contourStableTests = map[string]func(t *testing.T){
 	"hosts/multiple":               TestMultipleHosts,
 	"timeout":                      TestTimeout,
 	"visibility":                   TestVisibility,
+	//	"visibility/split":             TestVisibilitySplit,
+	//	"visibility/path":              TestVisibilityPath,
 }
 
 var stableTests = map[string]func(t *testing.T){
@@ -81,11 +85,14 @@ var stableTests = map[string]func(t *testing.T){
 	*/
 }
 
-var contourBetaTests = map[string]func(t *testing.T){}
+var contourBetaTests = map[string]func(t *testing.T){
+	"headers/tags": TestTagHeaders,
+	//	"host-rewrite": TestRewriteHost,
+}
 
 var istioBetaTests = map[string]func(t *testing.T){
 	"headers/tags": TestTagHeaders,
-	//"host-rewrite": TestRewriteHost,
+	//	"host-rewrite": TestRewriteHost,
 }
 
 var betaTests = map[string]func(t *testing.T){
