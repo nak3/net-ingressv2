@@ -61,7 +61,7 @@ func TestVisibility(t *testing.T) {
 					}}},
 			},
 		}},
-	}, OverrideHTTPRouteLabel(gatewayLocalLabel))
+	})
 
 	// Ensure the service is not publicly accessible
 	for _, privateHostName := range privateHostNames {
@@ -168,7 +168,7 @@ func TestVisibilitySplit(t *testing.T) {
 		Rules: []gatewayv1alpha2.HTTPRouteRule{{
 			BackendRefs: backends,
 		}},
-	}, OverrideHTTPRouteLabel(gatewayLocalLabel))
+	})
 
 	// Ensure we can't connect to the private resources
 	RuntimeRequestWithExpectations(ctx, t, client, "http://"+privateHostName, []ResponseExpectation{StatusCodeExpectation(sets.NewInt(http.StatusNotFound))}, true)
@@ -366,7 +366,7 @@ func TestVisibilityPath(t *testing.T) {
 				}},
 			},
 		},
-	}, OverrideHTTPRouteLabel(gatewayLocalLabel))
+	})
 
 	// Ensure we can't connect to the private resources
 	for _, path := range []string{"", "/foo", "/bar", "/baz"} {

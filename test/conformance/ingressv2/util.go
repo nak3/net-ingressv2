@@ -113,12 +113,6 @@ func localGatewayNamespace() gatewayv1alpha2.Namespace {
 	return gatewayv1alpha2.Namespace(namespace)
 }
 
-// gatewayLabel is added to HTTPRoute. The external gateway selects the generated HTTPRoute by this label.
-var gatewayLabel = map[string]string{"knative-e2e-test": "net-ingressv2"}
-
-// gatewayLabel is added to HTTPRoute. The local gateway selects the generated HTTPRoute by this label.
-var gatewayLocalLabel = map[string]string{"knative-e2e-test": "net-ingressv2-local"}
-
 // uaRoundTripper wraps the given http.RoundTripper and
 // sets a custom UserAgent.
 type uaRoundTripper struct {
@@ -709,13 +703,6 @@ func OverrideHTTPRouteAnnotation(annotations map[string]string) Option {
 	}
 }
 
-// OverrideHTTPRouteLabel overrides the HTTPRoute label.
-func OverrideHTTPRouteLabel(labels map[string]string) Option {
-	return func(hr *gatewayv1alpha2.HTTPRoute) {
-		hr.Labels = labels
-	}
-}
-
 func createHTTPRouteReadyDialContext(ctx context.Context, t *testing.T, clients *test.Clients, spec gatewayv1alpha2.HTTPRouteSpec, io ...Option) (*gatewayv1alpha2.HTTPRoute, func(context.Context, string, string) (net.Conn, error), context.CancelFunc) {
 	t.Helper()
 
@@ -750,7 +737,6 @@ func CreateHTTPRoute(ctx context.Context, t *testing.T, clients *test.Clients, s
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
 			Namespace: test.ServingNamespace,
-			Labels:    gatewayLabel,
 		},
 		Spec: spec,
 	}
