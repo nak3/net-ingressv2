@@ -38,7 +38,7 @@ apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: contour-external-gatewayclass
 spec:
-  controller: projectcontour.io/contour-external/contour
+  controllerName: projectcontour.io/contour-external/contour
   parametersRef:
     group: operator.projectcontour.io
     kind: Contour
