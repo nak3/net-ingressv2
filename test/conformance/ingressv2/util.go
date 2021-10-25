@@ -51,7 +51,6 @@ import (
 	"knative.dev/networking/pkg/apis/networking"
 	"knative.dev/networking/test/types"
 	"knative.dev/pkg/network"
-	"knative.dev/pkg/ptr"
 	"knative.dev/pkg/reconciler"
 	pkgTest "knative.dev/pkg/test"
 	"knative.dev/pkg/test/logging"
@@ -87,17 +86,31 @@ var dialBackoff = wait.Backoff{
 }
 
 var testGateway = gatewayv1alpha2.ParentRef{
-	Name: "test-gateway",
+	Name: "knative-gateway",
 	// TODO: istio-system namespace should be configurable.
-	Namespace: namespacePtr("istio-system"),
-	Scope:     ptr.String("Namespace"),
+	Namespace: namespacePtr(gatewayNamespace()),
 }
 
 var testLocalGateway = gatewayv1alpha2.ParentRef{
-	Name: "test-local-gateway",
+	Name: "knative-local-gateway",
 	// TODO: istio-system namespace should be configurable.
-	Namespace: namespacePtr("istio-system"),
-	Scope:     ptr.String("Namespace"),
+	Namespace: namespacePtr(localGatewayNamespace()),
+}
+
+func gatewayNamespace() gatewayv1alpha2.Namespace {
+	namespace := "istio-system"
+	if gatewayNsOverride := os.Getenv("GATEWAY_NAMESPACE_OVERRIDE"); gatewayNsOverride != "" {
+		namespace = gatewayNsOverride
+	}
+	return gatewayv1alpha2.Namespace(namespace)
+}
+
+func localGatewayNamespace() gatewayv1alpha2.Namespace {
+	namespace := "istio-system"
+	if gatewayNsOverride := os.Getenv("LOCAL_GATEWAY_NAMESPACE_OVERRIDE"); gatewayNsOverride != "" {
+		namespace = gatewayNsOverride
+	}
+	return gatewayv1alpha2.Namespace(namespace)
 }
 
 // gatewayLabel is added to HTTPRoute. The external gateway selects the generated HTTPRoute by this label.
@@ -1123,7 +1136,7 @@ func IsHTTPRouteReady(r *gatewayv1alpha2.HTTPRoute) (bool, error) {
 
 func isGatewayAdmitted(gw gatewayv1alpha2.RouteParentStatus) bool {
 	for _, condition := range gw.Conditions {
-		if condition.Type == string(gatewayv1alpha2.ConditionRouteAdmitted) {
+		if condition.Type == string(gatewayv1alpha2.ConditionRouteAccepted) {
 			return condition.Status == metav1.ConditionTrue
 		}
 	}

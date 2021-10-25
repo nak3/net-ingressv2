@@ -59,7 +59,7 @@ func TestTagHeaders(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(port),
-							Name: name,
+							Name: gatewayv1alpha2.ObjectName(name),
 						}}},
 				},
 				Matches: []gatewayv1alpha2.HTTPRouteMatch{{
@@ -84,7 +84,7 @@ func TestTagHeaders(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(port),
-							Name: name,
+							Name: gatewayv1alpha2.ObjectName(name),
 						}}},
 				},
 				Filters: []gatewayv1alpha2.HTTPRouteFilter{{
@@ -169,7 +169,7 @@ func TestPreSplitSetHeaders(t *testing.T) {
 				BackendRef: gatewayv1alpha2.BackendRef{
 					BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 						Port: portNumPtr(port),
-						Name: name,
+						Name: gatewayv1alpha2.ObjectName(name),
 					}}},
 			},
 			Filters: []gatewayv1alpha2.HTTPRouteFilter{{
@@ -236,7 +236,7 @@ func TestPostSplitSetHeaders(t *testing.T) {
 				BackendRef: gatewayv1alpha2.BackendRef{
 					BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 						Port: portNumPtr(port),
-						Name: name,
+						Name: gatewayv1alpha2.ObjectName(name),
 					},
 					Weight: pointer.Int32Ptr(100 / splits),
 				},

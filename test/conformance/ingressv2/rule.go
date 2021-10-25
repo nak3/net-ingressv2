@@ -48,7 +48,7 @@ func TestRule(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(fooPort),
-							Name: fooName,
+							Name: gatewayv1alpha2.ObjectName(fooName),
 						},
 					},
 					Filters: []gatewayv1alpha2.HTTPRouteFilter{{
@@ -69,7 +69,7 @@ func TestRule(t *testing.T) {
 					}},
 					// This should be removed once https://github.com/kubernetes-sigs/gateway-api/issues/563 was solved.
 					Path: &gatewayv1alpha2.HTTPPathMatch{
-						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPrefix),
+						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPathPrefix),
 						Value: pointer.StringPtr("/"),
 					},
 				}},
@@ -79,7 +79,7 @@ func TestRule(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(barPort),
-							Name: barName,
+							Name: gatewayv1alpha2.ObjectName(barName),
 						},
 					},
 					Filters: []gatewayv1alpha2.HTTPRouteFilter{{
@@ -100,7 +100,7 @@ func TestRule(t *testing.T) {
 					}},
 					// This should be removed once https://github.com/kubernetes-sigs/gateway-api/issues/563 was solved.
 					Path: &gatewayv1alpha2.HTTPPathMatch{
-						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPrefix),
+						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPathPrefix),
 						Value: pointer.StringPtr("/"),
 					},
 				}},

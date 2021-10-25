@@ -51,7 +51,7 @@ func TestPercentage(t *testing.T) {
 				BackendRef: gatewayv1alpha2.BackendRef{
 					BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 						Port: portNumPtr(port),
-						Name: name,
+						Name: gatewayv1alpha2.ObjectName(name),
 					},
 					Weight: &weight,
 				},

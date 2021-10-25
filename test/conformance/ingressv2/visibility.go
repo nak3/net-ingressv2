@@ -57,7 +57,7 @@ func TestVisibility(t *testing.T) {
 				BackendRef: gatewayv1alpha2.BackendRef{
 					BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 						Port: portNumPtr(port),
-						Name: name,
+						Name: gatewayv1alpha2.ObjectName(name),
 					}}},
 			},
 		}},
@@ -98,7 +98,7 @@ func testProxyToHelloworld(ctx context.Context, t *testing.T, clients *test.Clie
 				BackendRef: gatewayv1alpha2.BackendRef{
 					BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 						Port: portNumPtr(proxyPort),
-						Name: proxyName,
+						Name: gatewayv1alpha2.ObjectName(proxyName),
 					}}},
 			},
 		}},
@@ -129,7 +129,7 @@ func TestVisibilitySplit(t *testing.T) {
 				BackendRef: gatewayv1alpha2.BackendRef{
 					BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 						Port: portNumPtr(port),
-						Name: name,
+						Name: gatewayv1alpha2.ObjectName(name),
 					},
 					Weight: &weight,
 				},
@@ -188,7 +188,7 @@ func TestVisibilitySplit(t *testing.T) {
 				BackendRef: gatewayv1alpha2.BackendRef{
 					BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 						Port: portNumPtr(proxyPort),
-						Name: proxyName,
+						Name: gatewayv1alpha2.ObjectName(proxyName),
 					}}},
 			},
 		}},
@@ -272,7 +272,7 @@ func TestVisibilityPath(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(fooPort),
-							Name: fooName,
+							Name: gatewayv1alpha2.ObjectName(fooName),
 						}},
 					// Append different headers to each split, which lets us identify
 					// which backend we hit.
@@ -288,7 +288,7 @@ func TestVisibilityPath(t *testing.T) {
 				}},
 				Matches: []gatewayv1alpha2.HTTPRouteMatch{{
 					Path: &gatewayv1alpha2.HTTPPathMatch{
-						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPrefix),
+						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPathPrefix),
 						Value: pointer.StringPtr("/foo"),
 					},
 				}},
@@ -298,7 +298,7 @@ func TestVisibilityPath(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(barPort),
-							Name: barName,
+							Name: gatewayv1alpha2.ObjectName(barName),
 						}},
 					// Append different headers to each split, which lets us identify
 					// which backend we hit.
@@ -314,7 +314,7 @@ func TestVisibilityPath(t *testing.T) {
 				}},
 				Matches: []gatewayv1alpha2.HTTPRouteMatch{{
 					Path: &gatewayv1alpha2.HTTPPathMatch{
-						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPrefix),
+						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPathPrefix),
 						Value: pointer.StringPtr("/bar"),
 					},
 				}},
@@ -324,7 +324,7 @@ func TestVisibilityPath(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(bazPort),
-							Name: bazName,
+							Name: gatewayv1alpha2.ObjectName(bazName),
 						}},
 					// Append different headers to each split, which lets us identify
 					// which backend we hit.
@@ -340,7 +340,7 @@ func TestVisibilityPath(t *testing.T) {
 				}},
 				Matches: []gatewayv1alpha2.HTTPRouteMatch{{
 					Path: &gatewayv1alpha2.HTTPPathMatch{
-						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPrefix),
+						Type:  pathMatchTypePtr(gatewayv1alpha2.PathMatchPathPrefix),
 						Value: pointer.StringPtr("/baz"),
 					},
 				}},
@@ -350,7 +350,7 @@ func TestVisibilityPath(t *testing.T) {
 					BackendRef: gatewayv1alpha2.BackendRef{
 						BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 							Port: portNumPtr(port),
-							Name: mainName,
+							Name: gatewayv1alpha2.ObjectName(mainName),
 						}},
 					// Append different headers to each split, which lets us identify
 					// which backend we hit.
@@ -388,7 +388,7 @@ func TestVisibilityPath(t *testing.T) {
 				BackendRef: gatewayv1alpha2.BackendRef{
 					BackendObjectReference: gatewayv1alpha2.BackendObjectReference{
 						Port: portNumPtr(proxyPort),
-						Name: proxyName,
+						Name: gatewayv1alpha2.ObjectName(proxyName),
 					}}},
 			},
 		}},
