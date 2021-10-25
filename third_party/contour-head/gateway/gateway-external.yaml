@@ -42,7 +42,6 @@ spec:
   parametersRef:
     group: operator.projectcontour.io
     kind: Contour
-    scope: Namespace
     name: contour-external
     namespace: contour-external
 ---
