@@ -40,7 +40,7 @@ var istioStableTests = map[string]func(t *testing.T){
 	"grpc/split":                   TestGRPCSplit,
 	"visibility":                   TestVisibility,
 	//	"visibility/split":             TestVisibilitySplit,
-	//	"visibility/path":              TestVisibilityPath,
+	"visibility/path": TestVisibilityPath,
 }
 
 var contourStableTests = map[string]func(t *testing.T){
@@ -55,7 +55,7 @@ var contourStableTests = map[string]func(t *testing.T){
 	"timeout":                      TestTimeout,
 	"visibility":                   TestVisibility,
 	//	"visibility/split":             TestVisibilitySplit,
-	//	"visibility/path":              TestVisibilityPath,
+	"visibility/path": TestVisibilityPath,
 }
 
 var stableTests = map[string]func(t *testing.T){
