@@ -39,7 +39,7 @@ var istioStableTests = map[string]func(t *testing.T){
 	"grpc":                         TestGRPC,
 	"grpc/split":                   TestGRPCSplit,
 	"visibility":                   TestVisibility,
-	//	"visibility/split":             TestVisibilitySplit,
+	"visibility/split":             TestVisibilitySplit,
 	//	"visibility/path":              TestVisibilityPath,
 }
 
@@ -54,7 +54,7 @@ var contourStableTests = map[string]func(t *testing.T){
 	"hosts/multiple":               TestMultipleHosts,
 	"timeout":                      TestTimeout,
 	"visibility":                   TestVisibility,
-	//	"visibility/split":             TestVisibilitySplit,
+	"visibility/split":             TestVisibilitySplit,
 	//	"visibility/path":              TestVisibilityPath,
 }
 
@@ -73,12 +73,12 @@ var stableTests = map[string]func(t *testing.T){
 	"websocket/split":              TestWebsocketSplit,
 	"grpc":                         TestGRPC,
 	"grpc/split":                   TestGRPCSplit,
+	"visibility":                   TestVisibility,
 	/*
 		"headers/probe":                TestProbeHeaders,
 		"retry":                        TestRetry,
 		"tls":                          TestIngressTLS,
 		"update":                       TestUpdate,
-		"visibility":                   TestVisibility,
 		"visibility/split":             TestVisibilitySplit,
 		"visibility/path":              TestVisibilityPath,
 		"ingressclass":                 TestIngressClass,
