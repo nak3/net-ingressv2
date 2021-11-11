@@ -138,10 +138,16 @@ func TestVisibilitySplit(t *testing.T) {
 				Filters: []gatewayv1alpha2.HTTPRouteFilter{{
 					Type: gatewayv1alpha2.HTTPRouteFilterRequestHeaderModifier,
 					RequestHeaderModifier: &gatewayv1alpha2.HTTPRequestHeaderFilter{
-						Set: []gatewayv1alpha2.HTTPHeader{{
-							Name:  headerName,
-							Value: name,
-						}},
+						Set: []gatewayv1alpha2.HTTPHeader{
+							{
+								Name:  headerName,
+								Value: name,
+							},
+							{
+								Name:  "test",
+								Value: "abc",
+							},
+						},
 					}},
 				}},
 		)
