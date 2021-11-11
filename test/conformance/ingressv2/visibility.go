@@ -216,6 +216,7 @@ func TestVisibilitySplit(t *testing.T) {
 			if ri == nil {
 				return errors.New("failed to request")
 			}
+			fmt.Printf("count %+v\n", ri.Request.Headers) // output for debug
 			resultCh <- ri.Request.Headers.Get(headerName)
 			return nil
 		})
@@ -226,7 +227,6 @@ func TestVisibilitySplit(t *testing.T) {
 	close(resultCh)
 
 	for r := range resultCh {
-		fmt.Printf("count %+v\n", r) // output for debug
 		seen[r] += increment
 	}
 	fmt.Printf("seen: %+v\n", seen) // output for debug
