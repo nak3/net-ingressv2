@@ -21,7 +21,7 @@ spec:
   gatewayClassName: istio
   addresses:
   - type: Hostname
-    value: knative-local-gateway.istio-system.svc.cluster.local
+    value: knative-local-gateway
   listeners:
   - name: default
     port: 80

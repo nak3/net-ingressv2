@@ -23,41 +23,6 @@ import (
 	"knative.dev/networking/test"
 )
 
-var istioStableTests = map[string]func(t *testing.T){
-	"basics":                       TestBasics,
-	"basics/http2":                 TestBasicsHTTP2,
-	"headers/pre-split":            TestPreSplitSetHeaders,
-	"headers/post-split":           TestPostSplitSetHeaders,
-	"dispatch/path":                TestPath,
-	"dispatch/percentage":          TestPercentage,
-	"dispatch/path_and_percentage": TestPathAndPercentageSplit,
-	"dispatch/rule":                TestRule,
-	"hosts/multiple":               TestMultipleHosts,
-	"timeout":                      TestTimeout,
-	"websocket":                    TestWebsocket,
-	"websocket/split":              TestWebsocketSplit,
-	"grpc":                         TestGRPC,
-	"grpc/split":                   TestGRPCSplit,
-	"visibility":                   TestVisibility,
-	"visibility/split":             TestVisibilitySplit,
-	//	"visibility/path":              TestVisibilityPath,
-}
-
-var contourStableTests = map[string]func(t *testing.T){
-	"basics":                       TestBasics,
-	"headers/pre-split":            TestPreSplitSetHeaders,
-	"headers/post-split":           TestPostSplitSetHeaders,
-	"dispatch/path":                TestPath,
-	"dispatch/percentage":          TestPercentage,
-	"dispatch/path_and_percentage": TestPathAndPercentageSplit,
-	"dispatch/rule":                TestRule,
-	"hosts/multiple":               TestMultipleHosts,
-	"timeout":                      TestTimeout,
-	"visibility":                   TestVisibility,
-	"visibility/split":             TestVisibilitySplit,
-	//	"visibility/path":              TestVisibilityPath,
-}
-
 var stableTests = map[string]func(t *testing.T){
 	"basics":                       TestBasics,
 	"basics/http2":                 TestBasicsHTTP2,
@@ -74,25 +39,15 @@ var stableTests = map[string]func(t *testing.T){
 	"grpc":                         TestGRPC,
 	"grpc/split":                   TestGRPCSplit,
 	"visibility":                   TestVisibility,
-	/*
-		"headers/probe":                TestProbeHeaders,
-		"retry":                        TestRetry,
-		"tls":                          TestIngressTLS,
-		"update":                       TestUpdate,
-		"visibility/split":             TestVisibilitySplit,
-		"visibility/path":              TestVisibilityPath,
-		"ingressclass":                 TestIngressClass,
+	"visibility/split":             TestVisibilitySplit,
+	"visibility/path":              TestVisibilityPath,
+	/* TODO: not implemented yet.
+	"headers/probe":                TestProbeHeaders,
+	"retry":                        TestRetry,
+	"tls":                          TestIngressTLS,
+	"update":                       TestUpdate,
+	"ingressclass":                 TestIngressClass,
 	*/
-}
-
-var contourBetaTests = map[string]func(t *testing.T){
-	"headers/tags": TestTagHeaders,
-	//	"host-rewrite": TestRewriteHost,
-}
-
-var istioBetaTests = map[string]func(t *testing.T){
-	"headers/tags": TestTagHeaders,
-	//	"host-rewrite": TestRewriteHost,
 }
 
 var betaTests = map[string]func(t *testing.T){
@@ -103,32 +58,23 @@ var betaTests = map[string]func(t *testing.T){
 
 var alphaTests = map[string]func(t *testing.T){
 	// Add your conformance test for alpha features
+	// TODO: not implemented yet.
+	// "httpoption": TestHTTPOption,
 }
 
 // RunConformance will run ingress conformance tests
 //
 // Depending on the options it may test alpha and beta features
 func RunConformance(t *testing.T) {
+	skipTests := skipTests()
 
-	var stables map[string]func(t *testing.T)
-	var betas map[string]func(t *testing.T)
-	switch test.NetworkingFlags.IngressClass {
-	case "istio":
-		stables = istioStableTests
-		betas = istioBetaTests
-	case "contour":
-		stables = contourStableTests
-		betas = contourBetaTests
-	default:
-		stables = stableTests
-		betas = betaTests
-	}
-
-	for name, test := range stables {
+	for name, test := range stableTests {
+		if _, ok := skipTests[name]; ok {
+			t.Run(name, skipFunc)
+			continue
+		}
 		t.Run(name, test)
 	}
-
-	skipTests := skipTests()
 
 	// TODO(dprotaso) we'll need something more robust
 	// in the long term that lets downstream
@@ -138,7 +84,7 @@ func RunConformance(t *testing.T) {
 	// ie. state - alpha, beta, ga
 	// ie. requirement - must, should, may
 	if test.NetworkingFlags.EnableBetaFeatures {
-		for name, test := range betas {
+		for name, test := range betaTests {
 			if _, ok := skipTests[name]; ok {
 				t.Run(name, skipFunc)
 				continue

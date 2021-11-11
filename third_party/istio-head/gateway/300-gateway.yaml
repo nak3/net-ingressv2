@@ -21,7 +21,7 @@ spec:
   gatewayClassName: istio
   addresses:
   - type: Hostname
-    value: istio-ingressgateway.istio-system.svc.cluster.local
+    value: istio-ingressgateway
   listeners:
   - name: default
     port: 80
