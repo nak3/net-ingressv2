@@ -247,6 +247,7 @@ func TestVisibilitySplit(t *testing.T) {
 			t.Errorf("Target %q received %f%%, wanted %f +/- %f", name, got, want, margin)
 		}
 	}
+	t.Errorf("error anyway")
 }
 
 func TestVisibilityPath(t *testing.T) {
