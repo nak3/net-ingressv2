@@ -37,8 +37,10 @@ go test -race -count=1 -short -timeout=20m -tags=e2e ./test/conformance/ingressv
    --enable-alpha --enable-beta \
    --skip-tests="${UNSUPPORTED_TESTS}" \
    --ingressendpoint="${IPS[0]}" \
-   --cluster-suffix=$CLUSTER_SUFFIX
+   --cluster-suffix=$CLUSTER_SUFFIX || true
 
 kubectl -n istio-system  logs -l app=istio-ingressgateway
 kubectl -n istio-system  logs -l app=istiod
 kubectl get httproutes.gateway.networking.k8s.io -n serving-tests  -o yaml
+
+exit 1
