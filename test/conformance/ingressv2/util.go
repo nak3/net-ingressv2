@@ -22,6 +22,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	cryptorand "crypto/rand"
+	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/json"
@@ -75,7 +76,10 @@ func namespacePtr(val gatewayv1alpha2.Namespace) *gatewayv1alpha2.Namespace {
 	return &val
 }
 
-var rootCAs = x509.NewCertPool()
+func sectionNamePtr(sectionName string) *gatewayv1alpha2.SectionName {
+	gwSectionName := gatewayv1alpha2.SectionName(sectionName)
+	return &gwSectionName
+}
 
 var dialBackoff = wait.Backoff{
 	Duration: 50 * time.Millisecond,
@@ -86,14 +90,18 @@ var dialBackoff = wait.Backoff{
 }
 
 var testGateway = gatewayv1alpha2.ParentRef{
-	Name: "knative-gateway",
-	// TODO: istio-system namespace should be configurable.
+	Name:      "knative-gateway",
 	Namespace: namespacePtr(gatewayNamespace()),
 }
 
+var testHTTPSGateway = gatewayv1alpha2.ParentRef{
+	Name:        "knative-gateway",
+	Namespace:   namespacePtr(gatewayNamespace()),
+	SectionName: sectionNamePtr("https"),
+}
+
 var testLocalGateway = gatewayv1alpha2.ParentRef{
-	Name: "knative-local-gateway",
-	// TODO: istio-system namespace should be configurable.
+	Name:      "knative-local-gateway",
 	Namespace: namespacePtr(localGatewayNamespace()),
 }
 
@@ -770,7 +778,10 @@ func CreateHTTPRoute(ctx context.Context, t *testing.T, clients *test.Clients, s
 }
 
 func CreateHTTPRouteReady(ctx context.Context, t *testing.T, clients *test.Clients, spec gatewayv1alpha2.HTTPRouteSpec, io ...Option) (*gatewayv1alpha2.HTTPRoute, *http.Client, context.CancelFunc) {
+	return CreateHTTPRouteReadyWithTLS(ctx, t, clients, spec, nil)
+}
 
+func CreateHTTPRouteReadyWithTLS(ctx context.Context, t *testing.T, clients *test.Clients, spec gatewayv1alpha2.HTTPRouteSpec, tlsConfig *tls.Config, io ...Option) (*gatewayv1alpha2.HTTPRoute, *http.Client, context.CancelFunc) {
 	t.Helper()
 
 	// Create a client with a dialer based on the HTTPRoute' public load balancer.
@@ -779,21 +790,55 @@ func CreateHTTPRouteReady(ctx context.Context, t *testing.T, clients *test.Clien
 	return hr, &http.Client{
 		Transport: &uaRoundTripper{
 			RoundTripper: &http.Transport{
-				DialContext: dialer,
+				DialContext:     dialer,
+				TLSClientConfig: tlsConfig,
 			},
 			ua: fmt.Sprintf("knative.dev/%s/%s", t.Name(), hr.Name),
 		},
 	}, cancel
 }
 
-// CreateTLSSecret creates a secret with TLS certs in the serving namespace.
-// This is based on https://golang.org/src/crypto/tls/generate_cert.go
-func CreateTLSSecret(ctx context.Context, t *testing.T, clients *test.Clients, hosts []string) (string, context.CancelFunc) {
-	return CreateTLSSecretWithCertPool(ctx, t, clients, hosts, test.ServingNamespace, rootCAs)
+// TODO
+func CreateGatewayReadyWithTLS(ctx context.Context, t *testing.T, clients *test.Clients, spec gatewayv1alpha2.GatewaySpec) (*gatewayv1alpha2.Gateway, context.CancelFunc) {
+	t.Helper()
+
+	name := test.ObjectNameForTest(t)
+
+	// Create a simple HTTPRoute over the Service.
+	gateway := &gatewayv1alpha2.Gateway{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: name,
+			//			Namespace: string(gatewayNamespace()),
+		},
+		Spec: spec,
+	}
+
+	t.Cleanup(func() { clients.GatewayAPIClient.Gateways.Delete(ctx, gateway.Name, metav1.DeleteOptions{}) })
+	if err := reconciler.RetryTestErrors(func(attempts int) (err error) {
+		if attempts > 0 {
+			t.Logf("Attempt %d creating gateway %s", attempts, gateway.Name)
+		}
+		gateway, err = clients.GatewayAPIClient.Gateways.Create(ctx, gateway, metav1.CreateOptions{})
+		if err != nil {
+			t.Logf("Attempt %d creating gateway failed with: %v", attempts, err)
+		}
+		return err
+	}); err != nil {
+		t.Fatalf("Error creating Gateway %q: %v", name, err)
+	}
+
+	return gateway, func() {
+		err := clients.GatewayAPIClient.Gateways.Delete(ctx, gateway.Name, metav1.DeleteOptions{})
+		if err != nil {
+			t.Errorf("Error cleaning up HTTPRoute %q: %v", name, err)
+		}
+	}
+
 }
 
-// CreateTLSSecretWithCertPool creates TLS certificate with given CertPool.
-func CreateTLSSecretWithCertPool(ctx context.Context, t *testing.T, clients *test.Clients, hosts []string, ns string, cas *x509.CertPool) (string, context.CancelFunc) {
+// CreateTLSSecret creates a secret with TLS certs in the serving namespace.
+// This is based on https://golang.org/src/crypto/tls/generate_cert.go
+func CreateTLSSecret(ctx context.Context, t *testing.T, clients *test.Clients, hosts []string) (string, *tls.Config, context.CancelFunc) {
 	t.Helper()
 
 	priv, err := ecdsa.GenerateKey(elliptic.P256(), cryptorand.Reader)
@@ -834,9 +879,10 @@ func CreateTLSSecretWithCertPool(ctx context.Context, t *testing.T, clients *tes
 	if err != nil {
 		t.Fatal("ParseCertificate() =", err)
 	}
+	pool := x509.NewCertPool()
 	// Ideally we'd undo this in "cancel", but there doesn't
 	// seem to be a mechanism to remove things from a pool.
-	cas.AddCert(cert)
+	pool.AddCert(cert)
 
 	certPEM := &bytes.Buffer{}
 	if err := pem.Encode(certPEM, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}); err != nil {
@@ -856,7 +902,7 @@ func CreateTLSSecretWithCertPool(ctx context.Context, t *testing.T, clients *tes
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
-			Namespace: ns,
+			Namespace: test.ServingNamespace,
 			Labels: map[string]string{
 				"test-secret": name,
 			},
@@ -873,7 +919,7 @@ func CreateTLSSecretWithCertPool(ctx context.Context, t *testing.T, clients *tes
 	if _, err := clients.KubeClient.CoreV1().Secrets(secret.Namespace).Create(ctx, secret, metav1.CreateOptions{}); err != nil {
 		t.Fatal("Error creating Secret:", err)
 	}
-	return name, func() {
+	return name, &tls.Config{RootCAs: pool}, func() {
 		err := clients.KubeClient.CoreV1().Secrets(secret.Namespace).Delete(ctx, secret.Name, metav1.DeleteOptions{})
 		if err != nil {
 			t.Errorf("Error cleaning up Secret %s: %v", secret.Name, err)
