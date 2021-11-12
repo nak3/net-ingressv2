@@ -86,14 +86,12 @@ var dialBackoff = wait.Backoff{
 }
 
 var testGateway = gatewayv1alpha2.ParentRef{
-	Name: "knative-gateway",
-	// TODO: istio-system namespace should be configurable.
+	Name:      "knative-gateway",
 	Namespace: namespacePtr(gatewayNamespace()),
 }
 
 var testLocalGateway = gatewayv1alpha2.ParentRef{
-	Name: "knative-local-gateway",
-	// TODO: istio-system namespace should be configurable.
+	Name:      "knative-local-gateway",
 	Namespace: namespacePtr(localGatewayNamespace()),
 }
 
