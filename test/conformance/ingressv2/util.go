@@ -76,11 +76,6 @@ func namespacePtr(val gatewayv1alpha2.Namespace) *gatewayv1alpha2.Namespace {
 	return &val
 }
 
-func sectionNamePtr(sectionName string) *gatewayv1alpha2.SectionName {
-	gwSectionName := gatewayv1alpha2.SectionName(sectionName)
-	return &gwSectionName
-}
-
 var dialBackoff = wait.Backoff{
 	Duration: 50 * time.Millisecond,
 	Factor:   1.4,
