@@ -109,7 +109,7 @@ func testProxyToHelloworld(ctx context.Context, t *testing.T, clients *test.Clie
 }
 
 func TestVisibilitySplit(t *testing.T) {
-	t.Parallel()
+	//	t.Parallel()
 	ctx, clients := context.Background(), test.Setup(t)
 
 	// Use a post-split injected header to establish which split we are sending traffic to.
@@ -138,10 +138,16 @@ func TestVisibilitySplit(t *testing.T) {
 				Filters: []gatewayv1alpha2.HTTPRouteFilter{{
 					Type: gatewayv1alpha2.HTTPRouteFilterRequestHeaderModifier,
 					RequestHeaderModifier: &gatewayv1alpha2.HTTPRequestHeaderFilter{
-						Set: []gatewayv1alpha2.HTTPHeader{{
-							Name:  headerName,
-							Value: name,
-						}},
+						Set: []gatewayv1alpha2.HTTPHeader{
+							{
+								Name:  headerName,
+								Value: name,
+							},
+							{
+								Name:  "test",
+								Value: "abc",
+							},
+						},
 					}},
 				}},
 		)
@@ -216,6 +222,7 @@ func TestVisibilitySplit(t *testing.T) {
 			if ri == nil {
 				return errors.New("failed to request")
 			}
+			fmt.Printf("count %+v\n", ri.Request.Headers) // output for debug
 			resultCh <- ri.Request.Headers.Get(headerName)
 			return nil
 		})
@@ -228,6 +235,7 @@ func TestVisibilitySplit(t *testing.T) {
 	for r := range resultCh {
 		seen[r] += increment
 	}
+	fmt.Printf("seen: %+v\n", seen) // output for debug
 
 	for name, want := range weights {
 		got := seen[name]
@@ -239,6 +247,7 @@ func TestVisibilitySplit(t *testing.T) {
 			t.Errorf("Target %q received %f%%, wanted %f +/- %f", name, got, want, margin)
 		}
 	}
+	t.Errorf("error anyway")
 }
 
 func TestVisibilityPath(t *testing.T) {
