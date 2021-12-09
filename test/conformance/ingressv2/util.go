@@ -76,6 +76,11 @@ func namespacePtr(val gatewayv1alpha2.Namespace) *gatewayv1alpha2.Namespace {
 	return &val
 }
 
+func sectionNamePtr(sectionName string) *gatewayv1alpha2.SectionName {
+	gwSectionName := gatewayv1alpha2.SectionName(sectionName)
+	return &gwSectionName
+}
+
 var dialBackoff = wait.Backoff{
 	Duration: 50 * time.Millisecond,
 	Factor:   1.4,
@@ -87,6 +92,12 @@ var dialBackoff = wait.Backoff{
 var testGateway = gatewayv1alpha2.ParentRef{
 	Name:      "knative-gateway",
 	Namespace: namespacePtr(gatewayNamespace()),
+}
+
+var testHTTPSGateway = gatewayv1alpha2.ParentRef{
+	Name:        "knative-gateway",
+	Namespace:   namespacePtr(gatewayNamespace()),
+	SectionName: sectionNamePtr("https"),
 }
 
 var testLocalGateway = gatewayv1alpha2.ParentRef{
@@ -747,11 +758,11 @@ func CreateHTTPRoute(ctx context.Context, t *testing.T, clients *test.Clients, s
 	t.Cleanup(func() { clients.GatewayAPIClient.HTTPRoutes.Delete(ctx, hr.Name, metav1.DeleteOptions{}) })
 	if err := reconciler.RetryTestErrors(func(attempts int) (err error) {
 		if attempts > 0 {
-			t.Logf("Attempt %d creating httproute %s", attempts, hr.Name)
+			t.Logf("Attempt %d creating ingress %s", attempts, hr.Name)
 		}
 		hr, err = clients.GatewayAPIClient.HTTPRoutes.Create(ctx, hr, metav1.CreateOptions{})
 		if err != nil {
-			t.Logf("Attempt %d creating httproute failed with: %v", attempts, err)
+			t.Logf("Attempt %d creating ingress failed with: %v", attempts, err)
 		}
 		return err
 	}); err != nil {
@@ -785,6 +796,44 @@ func CreateHTTPRouteReadyWithTLS(ctx context.Context, t *testing.T, clients *tes
 			ua: fmt.Sprintf("knative.dev/%s/%s", t.Name(), hr.Name),
 		},
 	}, cancel
+}
+
+// TODO
+func CreateGatewayReadyWithTLS(ctx context.Context, t *testing.T, clients *test.Clients, spec gatewayv1alpha2.GatewaySpec) (*gatewayv1alpha2.Gateway, context.CancelFunc) {
+	t.Helper()
+
+	name := test.ObjectNameForTest(t)
+
+	// Create a simple HTTPRoute over the Service.
+	gateway := &gatewayv1alpha2.Gateway{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: name,
+			//			Namespace: string(gatewayNamespace()),
+		},
+		Spec: spec,
+	}
+
+	t.Cleanup(func() { clients.GatewayAPIClient.Gateways.Delete(ctx, gateway.Name, metav1.DeleteOptions{}) })
+	if err := reconciler.RetryTestErrors(func(attempts int) (err error) {
+		if attempts > 0 {
+			t.Logf("Attempt %d creating gateway %s", attempts, gateway.Name)
+		}
+		gateway, err = clients.GatewayAPIClient.Gateways.Create(ctx, gateway, metav1.CreateOptions{})
+		if err != nil {
+			t.Logf("Attempt %d creating gateway failed with: %v", attempts, err)
+		}
+		return err
+	}); err != nil {
+		t.Fatalf("Error creating Gateway %q: %v", name, err)
+	}
+
+	return gateway, func() {
+		err := clients.GatewayAPIClient.Gateways.Delete(ctx, gateway.Name, metav1.DeleteOptions{})
+		if err != nil {
+			t.Errorf("Error cleaning up HTTPRoute %q: %v", name, err)
+		}
+	}
+
 }
 
 // CreateTLSSecret creates a secret with TLS certs in the serving namespace.

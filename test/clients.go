@@ -19,6 +19,8 @@ limitations under the License.
 package test
 
 import (
+	"os"
+
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -41,6 +43,7 @@ type Clients struct {
 // networking clients.
 type GatewayAPIClients struct {
 	HTTPRoutes gatewayv1alpha2.HTTPRouteInterface
+	Gateways   gatewayv1alpha2.GatewayInterface
 }
 
 // NewClientsFromConfig instantiates and returns several clientsets required for making request to the
@@ -81,7 +84,15 @@ func newGatewayAPIClients(cfg *rest.Config, namespace string) (*GatewayAPIClient
 	if err != nil {
 		return nil, err
 	}
+
+	gatewayNamespace := "istio-system"
+	if gatewayNsOverride := os.Getenv("GATEWAY_NAMESPACE_OVERRIDE"); gatewayNsOverride != "" {
+		gatewayNamespace = gatewayNsOverride
+	}
+
 	return &GatewayAPIClients{
 		HTTPRoutes: cs.GatewayV1alpha2().HTTPRoutes(namespace),
+		// TODO: Better way to specify the namespace? Gateway must be deployed in the system namespace.
+		Gateways: cs.GatewayV1alpha2().Gateways(gatewayNamespace),
 	}, nil
 }
